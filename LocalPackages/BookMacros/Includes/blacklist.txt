@@ -1,0 +1,7 @@
+assign(@blacklist,
+	array(
+		'/e',
+		'/cc'
+
+	)
+)
