@@ -25,8 +25,8 @@ proc(_bookmacro, @commands,
 	)
 	store_value(concat('bm.', player()), @thist)
 	
-	if(gt(array_size(@commands), 10),
-		die(concat(color(c), 'Sorry, you can\'t do more than 10 commands per book'))
+	if(gt(array_size(@commands), 5),
+		die(concat(color(c), 'Sorry, you can\'t do more than 5 commands per book'))
 	)
 	
 	include('Includes/blacklist.txt')
@@ -35,10 +35,10 @@ proc(_bookmacro, @commands,
 			if(equals(substr(@command, 0, 1), '/'),
 				assign(@ckcm, split(' ', @command)[0])
 				if(array_contains(@blacklist, @ckcm),
-					die(concat(color(4), @ckcm, ' is not permitted within book macros'))
+					msg(concat(color(4), @ckcm, ' is not permitted within book macros'))
+				, #else
+					chat(@command)
 				)
-				
-				chat(@command)
 			)
 		)
 	)
