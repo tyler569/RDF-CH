@@ -18,26 +18,28 @@
 proc(_bookmacro, @commands,
 	assign(@lastt, get_value(concat('bm.', player())))
 	assign(@thist, nano_time())
-
 	assign(@difft, subtract(@thist, @lastt))
-	
 	assign(@mindifft, multiply(3 /* seconds */, 1000000000))
 	if(lt(@difft, @mindifft),
 		die(concat(color(c), 'Slow down! You can\'t do that so often!'))
 	)
-	
 	store_value(concat('bm.', player()), @thist)
+	
+	if(gt(array_size(@commands), 10),
+		die(concat(color(c), 'Sorry, you can\'t do more than 10 commands per book'))
+	)
 	
 	include('Includes/blacklist.txt')
 	foreach(@commands, @command,
-		if(equals(substr(@command, 0, 1), '/'),
-			assign(@ckcm, split(' ', @command)[0])
-			if(array_contains(@blacklist, @ckcm),
-				die(concat(color(4), @ckcm, ' is not permitted within book macros'))
+		try(
+			if(equals(substr(@command, 0, 1), '/'),
+				assign(@ckcm, split(' ', @command)[0])
+				if(array_contains(@blacklist, @ckcm),
+					die(concat(color(4), @ckcm, ' is not permitted within book macros'))
+				)
+				
+				chat(@command)
 			)
-			
-			
-			chat(@command)
 		)
 	)
 )
