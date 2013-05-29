@@ -17,12 +17,14 @@
 
 proc(_bookmacro, @commands,
 	assign(@lastt, get_value(concat('bm.', player())))
-	assign(@thist, nano_time())
+	assign(@thist, time())
 	assign(@difft, subtract(@thist, @lastt))
-	assign(@mindifft, multiply(3 /* seconds */, 1000000000))
+	assign(@mindifft, multiply(3 /* seconds */, 1000))
+	
 	if(lt(@difft, @mindifft),
 		die(concat(color(c), 'Slow down! You can\'t do that so often!'))
 	)
+	
 	store_value(concat('bm.', player()), @thist)
 	
 	if(gt(array_size(@commands), 5),
