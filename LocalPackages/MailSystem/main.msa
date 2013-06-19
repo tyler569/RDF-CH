@@ -1,0 +1,30 @@
+#=========================================================================#
+#
+# RDF Server Mail System
+# Authored by: Tyler569
+#
+# Requires: RDF_CH_Commons
+# Permissions: ch.alias.all
+# Risk: low/none
+#
+#=========================================================================#
+
+*:/mail [$arg] [$to] [$] = >>>
+	_checkpermission('all', player())
+
+	if(equals_ic($arg, 'send'),
+		_mail_gen($to, player(), $)
+	)
+
+	if(equals_ic($arg, 'read'),
+		if(equals($to, ''),
+			_mail_stat(player())
+		, #else
+			_mail_read(player(), $to)
+		)
+	)
+
+	if(equals_ic($arg, 'clear'),
+		_mail_clear(player())
+	)
+<<<
