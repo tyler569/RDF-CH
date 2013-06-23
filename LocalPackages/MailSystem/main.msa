@@ -4,27 +4,50 @@
 # Authored by: Tyler569
 #
 # Requires: RDF_CH_Commons
-# Permissions: ch.alias.all
+# Permissions: ch.alias.all (ch.alias.admin for admin commands)
 # Risk: low/none
 #
 #=========================================================================#
 
-*:/mail [$arg] [$to] [$] = >>>
+*:/mail [$0] [$1] [$] = >>>
 	_checkpermission('all', player())
-
-	if(equals_ic($arg, 'send'),
-		_mail_gen($to, player(), $)
+	assign(@args, array($0, $1, $))
+	
+	if(equals_ic(@args[0], 'send'),
+		_mail_send(@args[1], player(), @args[2])  ## Probably fine
+		die()
 	)
 
-	if(equals_ic($arg, 'read'),
-		if(equals($to, ''),
-			_mail_stat(player())
+	if(equals_ic(@args[0], 'read'),
+		if(equals(@args[1], ''),
+			_mail_view(player())  ## Redesign
 		, #else
-			_mail_read(player(), $to)
+			_mail_read(player(), @args[1])  ## Implement
 		)
+		die()
 	)
 
-	if(equals_ic($arg, 'clear'),
+	if(equals_ic(@args[0], 'clear'),
 		_mail_clear(player())
+		die()
 	)
+	
+	if(equals_ic(@args[0], 'admin'),
+		_checkpermission('admin', player())
+		
+		###CHANGE
+		if(equals_ic(@args[1], 'check'),
+			assign(@mailarray, get_value('mail'))
+			msg(@mailarray)
+			die()
+		)
+		###/CHANGE
+		
+		_rdf_syntaxerror('/mail', 'admin poop')
+	)
+	
+	_rdf_syntaxerror('/mail', 'noob poop')
 <<<
+
+
+

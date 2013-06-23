@@ -9,7 +9,13 @@
 #
 #=========================================================================#
 
-proc(_mail_gen, @to, @from, @msg,
+# MAIL STORAGE SYNTAX:
+#  All mail (to everyone) stored as array in get_value('mail')
+#  each value in array is a mail, stored as:
+#    {time() sent, player_to, player_from, message_text}
+#
+
+proc(_mail_send, @to, @from, @msg,
 	assign(@mail, array(time(), @to, @from, @msg))
 	assign(@mailarray, get_value('mail'))
 	if(equals(@mailarray, 'null'),
@@ -18,17 +24,38 @@ proc(_mail_gen, @to, @from, @msg,
 	array_push(@mailarray, @mail)
 	store_value('mail', @mailarray)
 	msg(concat(color(7), 'Mail sent!'))
-	tmsg(@to, concat(color(c), 'You have mail!', color(f), ' Do /mail read to view your messages'))
+	try(
+		tmsg(@to, concat(color(c), 'You have mail!', color(f), ' Do /mail read to view your messages'))
+	)
 )
 
-proc(_mail_stat, @player,
-	assign(@mailarray, get_value('mail'))
-	if(is_array(@mailarray),
-		foreach(@mailarray, @mail,
-			if(equals(@mail[1], @player),
-				msg(concat('From: ', @mail[2], ' ', _timediff(@mail[0])))
+proc(_mail_index, @player,
+	if(equals(_has_mail(@player), 'true'),
+		assign(@mailindex, array())
+		assign(@mailarray, get_value('mail'))
+		if(is_array(@mailarray),
+			foreach(@mailarray, @mail,
+				if(equals(@mail[1], @player),
+					array_push(@mailindex, @mail)
+				)
 			)
 		)
+		return(@mailindex)
+	, #else
+		return('null')
+	)
+)
+
+proc(_mail_view, @player,
+	assign(@mails, _mail_index(@player))
+	if(equals(@mails, 'null'),
+		msg(concat(color(7), 'You have no mail!'))
+		die()
+	)
+	for(assign(@i, 0), lt(@i, length(@mails)), inc(@i),
+		assign(@mail, @mails[@i])
+		assign(@diff, _timediff(@mail[0]))
+		msg(concat(add(@i, 1), ': From: ', @mail[1], ', ', @diff))
 	)
 )
 
@@ -40,12 +67,13 @@ proc(_mail_clear, @player,
 	assign(@mailarray, get_value('mail'))
 	if(is_array(@mailarray),
 		assign(@length, length(@mailarray))
+		assign(@ma_out, array())
 		for(assign(@i, 0), lt(@i, @length), inc(@i),
-			if(equals(@mailarray[@i][1], @player),
-				array_remove(@mailarray, @i)
+			if(nequals_ic(@mailarray[@i][1], @player),
+				array_push(@ma_out, @mailarray[@i])
 			)
 		)
-		store_value('mail', @mailarray)
+		store_value('mail', @ma_out)
 		msg(concat(color(7), 'Mail cleared'))
 	)
 )
