@@ -45,11 +45,11 @@ bind(player_chat, null, null, @event,
 	)
 	if(
 		and(
-			nequals(get_value(concat('cc.player.', player())), 'null'),
+			nequals(get_value(concat('cc.player.', player())), '$'),
 			not(@slashe)
 		),
 		assign(@send, @event['message'])
-		_cc_channelChat(player(), @send)
+		_cc_channelChat(player(), @send, 'null')
 		console(sconcat('CChat -', player(), get_value(concat('cc.player.', player())), @send))
 		cancel()
 	)

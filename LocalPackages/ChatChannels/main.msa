@@ -9,7 +9,12 @@
 #
 #=========================================================================#
 
-*:/cc [$a1] [$a2] [$a3] = >>>
+*:/chatchannel [$] = >>>
+	msg(concat(color(8), '*psst* /cc is easier'))
+	call_alias(sconcat('/cc', $))
+<<<
+
+*:/cc [$a1] [$a2] [$a3] [$] = >>>
 
 # Command is the main userside control for package
 # Commands and ref follow:
@@ -133,7 +138,15 @@
 			)
 			die()
 		)
-		_rdf_syntaxerror('/cc admin', '(find | view | close | pull) <arg>\n/cc admin (view | spy)')
+		if(equals($a2, 'chat'),
+			if(lt(length($a3),1),
+				_rdf_syntaxerror('/cc admin chat', '<channel> <message>')
+			)
+			_cc_channelChat(player(), $, to_upper($a3))
+			die()
+		)
+			
+		_rdf_syntaxerror('/cc admin', '(find | view | close | pull) <arg>\n/cc admin (view | spy)\n/cc admin chat <channel> <message>')
 	)
 	_rdf_syntaxerror('/cc', 'join <channel>\n/cc (leave | view | info)')
 <<<
@@ -144,6 +157,33 @@
 # if used while not in channel - chat goes to global
 
 	chat(concat('Z7F2iS940RQc', $))
+<<<
+
+*:/adminchat [$] = >>>
+	_checkpermission('admin', player())
+	msg(concat(color(8), '*psst* /ac is easier'))
+	call_alias(sconcat('/ac', $))
+<<<
+
+*:/'#' [$] = >>>
+	_checkpermission('admin', player())
+	call_alias(sconcat('/ac', $))
+<<<
+
+*:/ac [$] = >>>
+	_checkpermission('admin', player())
+	_cc_channelChat(player(), $, 'ADMIN')
+<<<
+
+*:/modchat [$] = >>>
+	_checkpermission('mod', player())
+	msg(concat(color(8), '*psst* /mc is easier'))
+	call_alias(sconcat('/ac', $))
+<<<
+
+*:/mc [$] = >>>
+	_checkpermission('mod', player())
+	_cc_channelChat(player(), $, 'MOD')
 <<<
 
 

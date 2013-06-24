@@ -9,17 +9,17 @@
 #
 #=========================================================================#
 
-*:/adminchat [$] = >>>
-	_checkpermission('admin', player())
-	_adminchat($)
-<<<
+# *:/adminchat [$] = >>>
+	# _checkpermission('admin', player())
+	# _adminchat($)
+# <<<
 
-*:/ac [$] = >>>
-	_checkpermission('admin', player())
-	_adminchat($)
-<<<
+# *:/ac [$] = >>>
+	# _checkpermission('admin', player())
+	# _adminchat($)
+# <<<
 
-*:/'#' [$] = >>>
-	_checkpermission('admin', player())
-	_adminchat($)
-<<<
+# *:/'#' [$] = >>>
+	# _checkpermission('admin', player())
+	# _adminchat($)
+# <<<

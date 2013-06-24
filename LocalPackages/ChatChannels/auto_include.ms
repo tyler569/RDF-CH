@@ -123,7 +123,7 @@ proc(_cc_onlinetest, @channel,
 	store_value(concat('cc.channel.', @channel), @players)
 )
 
-proc(_cc_channelChat, @player, @chat,
+proc(_cc_channelChat, @player, @chat, @channel,
 
 # Procedure called to pass chat on to users in channel
 	
@@ -131,29 +131,35 @@ proc(_cc_channelChat, @player, @chat,
 		_rdf_syntaxerror(get_cmd(), '<message to channel chat>')
 	)
 	
-	assign(@channel, get_value(concat('cc.player.', @player)))
-	
-	if(equals(@channel, 'null'),
-		msg(concat(color(c), 'You are not in a channel,'))
-		die(concat(color(c), '/cc join <channel> to join one'))
+	if(equals(@channel, '$'),
+		assign(@channel, get_value(concat('cc.player.', @player)))
 	)
+		
+	# if(equals(@channel, 'null'),
+		# msg(concat(color(c), 'You are not in a channel,'))
+		# die(concat(color(c), '/cc join <channel> to join one'))
+	# )
 	
-	assign(@namecolor, get_value(concat(to_lower(player()),'_namecolor')))
-	assign(@nameformat, get_value(concat(to_lower(player()),'_nameformat')))
-	if(or(equals(@nameformat, 'null'), equals(@namecolor, 'null')),
-		assign(@nameformat, color('p'))
-		assign(@namecolor, 'b')
-	)
-	assign(@nf, concat(color(@namecolor), @nameformat))
+	assign(@chdisp, _cc_chdisp(@channel))
 	
 	assign(@plrsto, get_value(concat('cc.channel.', @channel)))
+	if(not(is_array(@plrsto)),
+		assign(@plrsto, array())
+	)
 	foreach(all_players(), @plr,
 		if(array_contains_ic(@plrsto, @plr),
-			tmsg(@plr, concat(color(9),'[',@channel,']',@nf ,@player,' ',color(f),@chat))
+			tmsg(@plr, concat(@chdisp,color(b),@player,' ',color(7),@chat))
+		, #else
+			if(and(equals(@channel, 'ADMIN'), has_permission('cc.alias.admin')),
+				tmsg(@plr, concat(@chdisp,color(b),@player,' ',color(7),@chat))
 			, #else
-			if(get_value(concat('cc.ccspy.',@plr)),
-				_checkpermission('admin', @plr)
-				tmsg(@plr, concat(color(8),'[SPY]',color(9),'[',@channel,']',@nf ,@player,' ',color(f),@chat))
+				if(and(equals(@channel, 'MOD'), has_permission('cc.alias.mod')),
+					tmsg(@plr, concat(@chdisp,color(b),@player,' ',color(7),@chat))
+				, #else
+					if(get_value(concat('cc.ccspy.',@plr)),
+						tmsg(@plr, concat(color(8),'[SPY]',@chdisp,color(b),@player,' ',color(7),@chat))
+					)
+				)
 			)
 		)
 	)
@@ -163,8 +169,9 @@ proc(_cc_jl_broadcast, @player, @channel, @jl,
 
 # Broadcast to users in a channel when a player joins or leaves
 
+	assign(@chdisp, _cc_chdisp(@channel))
 	foreach(get_value(concat('cc.channel.', @channel)), @channelplr,
-		tmsg(@channelplr, concat(color(9),'[',@channel,']',color(f),': ',color(a), @player, color(7), ' has ', @jl, ' the channel'))
+		tmsg(@channelplr, concat(@chdisp,color(f),': ',color(a), @player, color(7), ' has ', @jl, ' the channel'))
 	)
 )
 
@@ -206,6 +213,15 @@ proc(_cc_icrepl, @player,
 		)
 	)
 	return(@player)
+)
+
+proc(_cc_chdisp, @channel,
+ 	try(
+		assign(@chdisp, concat(array('ADMIN':color(4), 'MOD':color(c))[@channel], '[#]'))
+	, #except
+		assign(@chdisp, concat(color(9), '[', @channel, ']'))
+	)
+	return(@chdisp)
 )
 
 ##### ADMIN PROCS #####
